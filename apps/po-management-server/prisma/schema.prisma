@@ -1,0 +1,57 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  approvalWorkflows ApprovalWorkflow[]
+  createdAt         DateTime           @default(now())
+  email             String?            @unique
+  firstName         String?
+  id                String             @id @default(cuid())
+  lastName          String?
+  password          String
+  roles             Json
+  updatedAt         DateTime           @updatedAt
+  username          String             @unique
+}
+
+model Material {
+  createdAt   DateTime @default(now())
+  description String?
+  id          String   @id @default(cuid())
+  name        String?
+  price       Float?
+  updatedAt   DateTime @updatedAt
+}
+
+model ApprovalWorkflow {
+  createdAt       DateTime       @default(now())
+  id              String         @id @default(cuid())
+  level           Int?
+  purchaseOrder   PurchaseOrder? @relation(fields: [purchaseOrderId], references: [id])
+  purchaseOrderId String?
+  updatedAt       DateTime       @updatedAt
+  user            User?          @relation(fields: [userId], references: [id])
+  userId          String?
+}
+
+model PurchaseOrder {
+  approvalWorkflows ApprovalWorkflow[]
+  createdAt         DateTime                 @default(now())
+  id                String                   @id @default(cuid())
+  items             Json?
+  orderDate         DateTime?
+  orderNumber       String?
+  status            EnumPurchaseOrderStatus?
+  totalAmount       Float?
+  updatedAt         DateTime                 @updatedAt
+}
+
+enum EnumPurchaseOrderStatus {
+  Option1
+}
